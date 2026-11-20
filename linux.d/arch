@@ -1,0 +1,57 @@
+# Arch Linux and derivatives (CachyOS, EndeavourOS, Manjaro, ...)
+# Arch ships headers in the main packages, so there are no separate -dev packages.
+FOUND_GTK3=$(pacman -Q gtk3 2>/dev/null || true)
+
+REQUIRED_DEV_PACKAGES=(
+    autoconf
+    automake
+    base-devel
+    bzip2
+    cmake
+    curl
+    dbus
+    eglexternalplatform
+    extra-cmake-modules
+    file
+    fuse2
+    gettext
+    git
+    glu
+    gst-plugins-base-libs
+    gstreamer
+    gtk3
+    libmspack
+    libsecret
+    libtool
+    libunwind
+    libxkbcommon
+    m4
+    mesa
+    nasm
+    ninja
+    openssl
+    perl
+    texinfo
+    wayland
+    wayland-protocols
+    wget
+    x264
+    yasm
+)
+
+if [[ -n "$UPDATE_LIB" ]]
+then
+    REQUIRED_DEV_PACKAGES+=(webkit2gtk-4.1)
+    NEEDED_PKGS=()
+    for PKG in ${REQUIRED_DEV_PACKAGES[@]}; do
+        pacman -Q ${PKG} > /dev/null 2>&1 || pacman -Qg ${PKG} > /dev/null 2>&1 || NEEDED_PKGS+=(${PKG})
+    done
+
+    if [ ${#NEEDED_PKGS[@]} -gt 0 ]; then
+        sudo pacman -S --needed --noconfirm ${NEEDED_PKGS[@]}
+    fi
+    echo -e "done\n"
+    exit 0
+fi
+
+FOUND_GTK3_DEV=$(pacman -Q gtk3 2>/dev/null || true)

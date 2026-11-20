@@ -5,7 +5,7 @@ export ROOT=$(dirname $(readlink -f ${0}))
 set -e # exit on first error
 
 function check_available_memory_and_disk() {
-    FREE_MEM_GB=$(free -g -t | grep 'Mem' | rev | cut -d" " -f1 | rev)
+    FREE_MEM_GB=$(( $(awk '/^MemAvailable:/ {print $2}' /proc/meminfo) / 1024 / 1024 ))
     MIN_MEM_GB=10
 
     FREE_DISK_KB=$(df -k . | tail -1 | awk '{print $4}')
@@ -147,7 +147,7 @@ fi
 
 if ! [[ -n "${DISABLE_PARALLEL_LIMIT}" ]]
 then
-    FREE_MEM_GB=$(free -g -t | grep 'Mem' | rev | cut -d" " -f1 | rev)
+    FREE_MEM_GB=$(( $(awk '/^MemAvailable:/ {print $2}' /proc/meminfo) / 1024 / 1024 ))
     MAX_THREADS=$((FREE_MEM_GB * 10 / 25))
     if [ "$MAX_THREADS" -lt 1 ]; then
         export CMAKE_BUILD_PARALLEL_LEVEL=1
